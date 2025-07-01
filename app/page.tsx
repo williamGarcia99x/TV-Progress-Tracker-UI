@@ -1,5 +1,6 @@
 "use client";
 
+import Button from "@mui/material/Button";
 import { useState } from "react";
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
       <button className="p-2 bg-amber-500" onClick={() => setCount(count + 1)}>
         Click me
       </button>
+      <Button variant="contained">Hello World</Button>
       <p>{count}</p>
     </div>
   );

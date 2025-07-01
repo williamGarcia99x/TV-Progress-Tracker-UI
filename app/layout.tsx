@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Providers from "./Providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,15 +9,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <meta name="viewport" content="initial-scale=1, width=device-width" />
+      <body className={` antialiased`}>
+        {/* The Providers component wraps the children with the QueryClientProvider */}
+        {/* to provide the query client context to the application. */}
+        {/* It allows the use of React Query hooks in the children components. */}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
