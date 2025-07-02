@@ -24,8 +24,8 @@ export default function RootLayout({
         <Providers>
           {/* Include a header that has the Title of the app and logo. It should not be constrained
           by the app-wrapper*/}
-          <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">TV Progress Tracker</h1>
+          <header className="bg-gold-main bg-gradient-to-br from-10% via-[#ead98d98] to-80%   text-[#4E342E] p-4 flex items-center justify-between">
+            <h1 className="text-2xl  font-bold">TV Progress Tracker</h1>
             <SearchMedia />
           </header>
           <div className="app-wrapper">{children}</div>

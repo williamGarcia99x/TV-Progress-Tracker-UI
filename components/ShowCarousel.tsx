@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ShowSummary } from "@/lib/tmdb";
+import Link from "next/link";
 
 interface ShowCarouselProps {
   shows: ShowSummary[];
@@ -23,12 +24,14 @@ export default function ShowCarousel({
 }: ShowCarouselProps) {
   return (
     <Carousel className={cn(className)} opts={opts}>
-      <CarouselContent className="px-4  h-[270px]">
+      <CarouselContent className="px-4 h-[340px]   ">
         {shows.map((show) => (
-          <CarouselItem key={show.id} className="basis-auto pl-2">
-            <div className="h-full flex items-stretch">
-              <TvShowCard show={show} />
-            </div>
+          <CarouselItem key={show.id} className="basis-auto pl-2 ">
+            <Link href={`/shows/${show.id}`}>
+              <div className="h-full flex   ">
+                <TvShowCard show={show} />
+              </div>
+            </Link>
           </CarouselItem>
         ))}
       </CarouselContent>

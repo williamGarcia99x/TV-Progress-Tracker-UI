@@ -9,56 +9,27 @@ export default async function Home() {
   const { results: topRatedShows } = await getTopRated([1, 2, 3]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-10 px-2 md:px-8">
-      <div className="max-w-6xl mx-auto">
-        <section className="mb-14">
-          <h2 className="text-2xl font-semibold text-slate-100 mb-4 pl-2 tracking-tight">
+    <main className="min-h-screen py-10  ">
+      <div className="flex flex-col gap-y-0">
+        <section className="">
+          <h2 className="text-2xl font-semibold text-cinematic-mocha mb-2 pl-2 tracking-tight">
             Trending Shows
           </h2>
-          <ShowCarousel
-            shows={trendingShows}
-            className="rounded-xl shadow-xl bg-slate-800/80"
-          />
+          <ShowCarousel shows={trendingShows} className=" " />
         </section>
-        <section className="mb-14">
-          <h2 className="text-2xl font-semibold text-slate-100 mb-4 pl-2 tracking-tight">
+        <section className="">
+          <h2 className="text-2xl font-semibold text-cinematic-mocha mb-2 pl-2 tracking-tight">
             Popular Shows
           </h2>
-          <ShowCarousel
-            shows={popularShows}
-            className="rounded-xl shadow-xl bg-slate-800/80"
-          />
+          <ShowCarousel shows={popularShows} className=" " />
         </section>
-        <section className="mb-14">
-          <h2 className="text-2xl font-semibold text-slate-100 mb-4 pl-2 tracking-tight">
+        <section className="">
+          <h2 className="text-2xl font-semibold text-cinematic-mocha mb-2 pl-2 tracking-tight">
             Top Rated
           </h2>
-          <ShowCarousel
-            shows={topRatedShows}
-            className="rounded-xl shadow-xl bg-slate-800/80"
-          />
+          <ShowCarousel shows={topRatedShows} className=" " />
         </section>
       </div>
     </main>
   );
-
-  // return (
-  //   <div>
-  //     {/* Three horizontal carousel of TV cards will be here */}
-  //     {/* Each carousel will get its source from different API endpoints */}
-  //     {/* One carousel for trending shows */}
-  //     <section>
-  //       <h2>Trending Shows</h2>
-  //       <ShowCarousel shows={trendingShows} />
-  //     </section>
-  //     <section>
-  //       <h2>Popular Shows</h2>
-  //       <ShowCarousel shows={popularShows} />
-  //     </section>
-  //     <section>
-  //       <h2>Top Rated</h2>
-  //       <ShowCarousel shows={topRatedShows} />
-  //     </section>
-  //   </div>
-  // );
 }

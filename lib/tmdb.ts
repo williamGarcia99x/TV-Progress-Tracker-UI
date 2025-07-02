@@ -82,7 +82,7 @@ export const getPopularMultiplePages = async (pages: number[] = [1, 2]) => {
 export const searchShows = (query: string, page = 1) =>
   tmdbFetch<SearchResponse>("/search/tv", { query, page });
 
-export const getShowDetails = (id: number) =>
+export const getShowDetails = (id: string) =>
   tmdbFetch<ShowDetails>(`/tv/${id}`);
 
 // — example response typings (simplified) —
@@ -94,30 +94,78 @@ export interface SearchResponse {
   results: ShowSummary[];
   page: number;
 }
+
+//Brief summary of a TV show
+// This is the type used in the ShowCarousel component
 export interface ShowSummary {
-  backdrop_path: string | null;
   /** TMDB numeric ID */
   id: number;
   /** Localised title */
   name: string;
   /** Title in original language */
   original_name: string;
-  overview: string;
   poster_path: string | null;
-  /** Always "tv" for this endpoint variant */
-  media_type: "tv";
-  original_language: string;
-  genre_ids: number[];
-  popularity: number;
-  first_air_date: string;
-  vote_average: number;
-  vote_count: number;
-  origin_country: string[];
 }
-export interface ShowDetails {
+
+interface Genre {
   id: number;
   name: string;
-  overview: string;
 }
+
+//Detailed information about a TV show
+// This is the type used in the ShowDetails component
+// and the TrackSidebar component
+export interface ShowDetails extends ShowSummary {
+  /** Localised overview */
+  overview: string;
+  /** Original language code */
+  original_language: string;
+  /** List of genres */
+  genres: Genre[];
+  /** First air date */
+  first_air_date: string;
+  /** Last air date */
+  last_air_date: string;
+  /** Number of seasons */
+  number_of_seasons?: number;
+  /** Number of episodes */
+  number_of_episodes?: number;
+  /** Average rating */
+  vote_average: number;
+  /** Total number of votes */
+  vote_count: number;
+  /** Backdrop image path */
+  backdrop_path: string | null;
+  /** Poster image path */
+  poster_path: string | null;
+
+  popularity?: number; // Optional, not always present
+}
+
+const foo: ShowDetails = {
+  id: 123,
+  name: "Example Show",
+  original_name: "Example Show Original",
+  poster_path: "/example-poster.jpg",
+  overview: "This is an example show overview.",
+  original_language: "en",
+
+  genres: [
+    { id: 1, name: "Drama" },
+    { id: 2, name: "Comedy" },
+  ],
+  first_air_date: "2023-01-01",
+  last_air_date: "2023-12-31",
+  number_of_seasons: 2,
+  number_of_episodes: 20,
+  vote_average: 8.5,
+  vote_count: 1000,
+  backdrop_path: "/example-backdrop.jpg",
+  networks: {
+    id: 1,
+    name: "Example Network",
+    logo_path: "/example-network-logo.png",
+  },
+};
 
 // ────────────────────────────────────────────────────────────────

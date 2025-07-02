@@ -130,7 +130,8 @@
     padding: 0;
     height: 100vh;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
+    /* background-color: var(--color-salty-white); */
   }
 }
 
@@ -144,3 +145,20 @@
   display: flex;
   flex-direction: column;
 }
+
+@theme {
+  /* walk of fame color */
+  --color-gold-main: #efbf12e3;
+  --color-salty-white: #fff8e7; /*for Background*/
+  --color-cinematic-mocha: #4e342e; /*for Headers*/
+  --color-theater-red: #b71c1c; /*for Buttons or error messages*/
+  --color-navy-blue: #0a0a23; /*for Text and Links*/
+}
+
+/* Element	Color Name	HEX Code	Description
+Popcorn Yellow	Buttered Popcorn	#FCD757	Warm, inviting yellow. Main accent color.
+Shadow Yellow	Golden Kernel	#E5B635	Slightly darker yellow for depth.
+White Contrast	Salty White	#FFF8E7	Light creamy white, like popcorn fluff.
+Dark Contrast	Cinematic Charcoal	#1C1C1C	Dark UI base color, gives movie-theater vibes.
+Accent Red	Theater Curtain Red	#B71C1C	Inspired by old-school cinema curtains. Optional accent.
+Neutral Gray	Silver Screen	#A0A0A0	Useful for text and muted UI elements. */
