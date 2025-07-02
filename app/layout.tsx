@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
+import { Search } from "lucide-react";
+import SearchMedia from "@/components/ui/SearchMedia";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,7 +21,15 @@ export default function RootLayout({
         {/* The Providers component wraps the children with the QueryClientProvider */}
         {/* to provide the query client context to the application. */}
         {/* It allows the use of React Query hooks in the children components. */}
-        <Providers>{children}</Providers>
+        <Providers>
+          {/* Include a header that has the Title of the app and logo. It should not be constrained
+          by the app-wrapper*/}
+          <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold">TV Progress Tracker</h1>
+            <SearchMedia />
+          </header>
+          <div className="app-wrapper">{children}</div>
+        </Providers>
       </body>
     </html>
   );

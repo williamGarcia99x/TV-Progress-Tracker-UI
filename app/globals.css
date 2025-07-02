@@ -124,7 +124,23 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
   body {
-    @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
+}
+
+.app-wrapper {
+  width: 75%;
+  max-width: 1600px; /* or 1600px if preferred */
+  min-width: 1000px;
+  min-height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
 }
