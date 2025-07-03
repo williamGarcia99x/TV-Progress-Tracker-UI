@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 
-type TokenResponse = {
+export interface AuthResponse {
   token: string;
   userId: number;
-};
+  expiresAt: string; // ISO date string
+}
 
 function useAuthMutation(type: "login" | "register") {
   const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -12,7 +13,7 @@ function useAuthMutation(type: "login" | "register") {
     mutationFn: async (credentials: {
       username: string;
       password: string;
-    }): Promise<TokenResponse | void> => {
+    }): Promise<AuthResponse | void> => {
       const response = await fetch(`${backendUrl}/auth/${type}`, {
         method: "POST",
         headers: {
