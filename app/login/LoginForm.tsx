@@ -3,7 +3,7 @@
 import { AuthForm } from "@/components/AuthForm";
 import useAuthMutation, { AuthResponse } from "@/lib/hooks/useAuthMutation";
 import { GalleryVerticalEnd } from "lucide-react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 async function storeSessionAsCookie({

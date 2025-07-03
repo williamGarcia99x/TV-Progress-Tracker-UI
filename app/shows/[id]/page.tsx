@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 // import TrackSidebar from "./TrackSidebar";
 import { getShowDetails, ShowDetails } from "@/lib/tmdb";
 import { cookies } from "next/headers";
+import { get } from "http";
+import { getTrackingByUserAndShow, UserTvTracker } from "@/lib/trackerService";
 
 // ---------- helpers ----------
 
@@ -20,21 +22,31 @@ export default async function ShowDetailsPage({
 
   const cookieStore = await cookies();
   const isLoggedIn = cookieStore.has("token");
-  //If the user is not logged in, we cannot fetch the tracking information for the show.
 
-  //Perform error handling on the showId using a try-catch block
   let show: ShowDetails | null = null;
+  let trackingInfo: UserTvTracker | null = null;
+
   try {
     show = await getShowDetails(showId);
+    if (!show) return notFound();
+
+    if (isLoggedIn) {
+      //if the user is logged in, we can fetch the tracking information for the show
+      trackingInfo = await getTrackingByUserAndShow(
+        cookieStore.get("userId")?.value as string,
+        showId,
+        cookieStore.get("token")?.value as string
+      );
+    }
   } catch (error) {
     //The notFound page should display the error message passed
-    console.error("Error fetching show details:", error);
+    console.error(error.message);
 
     //navigate to the notFound page
     return notFound();
   }
 
-  if (!show) return notFound();
+  //as long as the show exists, we return the page
 
   //Need fallbacks for backdrop and poster images. Will do later
   //   // ----- FALLBACKS -----
@@ -141,6 +153,11 @@ export default async function ShowDetailsPage({
               </p>
               <p className="text-sm">
                 {isLoggedIn ? "You are logged in" : "You are not logged in"}
+              </p>
+              <p className="text-sm">
+                {trackingInfo
+                  ? "Tracking information available"
+                  : "No tracking info"}
               </p>
 
               {/* <div className="flex items-center gap-4">

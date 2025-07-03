@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   // Optional userId cookie (readable by client)
   cookieStore.set("userId", String(userId), {
     path: "/",
-    maxAge: new Date(expiresAt).getTime() - Date.now(),
+    expires: new Date(expiresAt), // Set cookie expiration based on expiresAt
   });
 
   return res;

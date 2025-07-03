@@ -141,31 +141,3 @@ export interface ShowDetails extends ShowSummary {
 
   popularity?: number; // Optional, not always present
 }
-
-const foo: ShowDetails = {
-  id: 123,
-  name: "Example Show",
-  original_name: "Example Show Original",
-  poster_path: "/example-poster.jpg",
-  overview: "This is an example show overview.",
-  original_language: "en",
-
-  genres: [
-    { id: 1, name: "Drama" },
-    { id: 2, name: "Comedy" },
-  ],
-  first_air_date: "2023-01-01",
-  last_air_date: "2023-12-31",
-  number_of_seasons: 2,
-  number_of_episodes: 20,
-  vote_average: 8.5,
-  vote_count: 1000,
-  backdrop_path: "/example-backdrop.jpg",
-  networks: {
-    id: 1,
-    name: "Example Network",
-    logo_path: "/example-network-logo.png",
-  },
-};
-
-// ────────────────────────────────────────────────────────────────
