@@ -72,6 +72,9 @@ export const getTrackingByUserAndShow = async (
       //The authorization header is used to authenticate the request
       Authorization: `Bearer ${token}`,
     },
+    next: {
+      tags: ["tracker_data"],
+    },
   });
 
   if (!res.ok) {

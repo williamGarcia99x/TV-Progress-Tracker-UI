@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { TrackingInfoForm } from "./TrackingInfoForm";
 import { createTracker } from "@/lib/trackerActions";
 import { useFormState, useFormStatus } from "react-dom";
+import ShowDetailsContent from "./ShowDetailsContent";
 
 // ---------- helpers ----------
 
@@ -41,6 +42,9 @@ export default async function ShowDetailsPage({
         showId,
         cookieStore.get("token")?.value as string
       );
+
+      console.log("TrackingInfo inside ShowDetailsPage");
+      console.log(trackingInfo);
     }
   } catch (error) {
     //The notFound page should display the error message passed
@@ -61,12 +65,9 @@ export default async function ShowDetailsPage({
   //     ? TMDB_IMG(show.poster_path, "w500")
   //     : "/fallback-poster.jpg";
 
-  // ----- GENRES -----
-  const genreList = show.genres?.map((g) => g.name).join(", ") || "N/A";
-
   return (
     // Content for page
-    <main className="h-full">
+    <div className="h-full">
       {/* The flex settings do not apply to the element below because it's absolute */}
       <div className="page-background fixed inset-0 -z-50">
         <Image
@@ -79,113 +80,11 @@ export default async function ShowDetailsPage({
         <div className="absolute inset-0 bg-black/70" />
       </div>
 
-      <div className="information-card relative h-full w-full flex justify-center items-center ">
-        {/* Show information Card. Centered on page */}
-        {/* backdrop image in card */}
-        {/* This is centered on page thanks to the div.information-card  */}
-        <div className="relative flex justify-between   h-3/4 w-11/12">
-          {/* Poster */}
-          {/* adding w-full forces the div to take up the full width alloted to it from its flex parent */}
-          <div className="relative basis-[40%] shrink-0">
-            <Link
-              href={`https://www.themoviedb.org/tv/${show.id}`}
-              target="_blank"
-              className="shrink-0 outline-none focus-visible:ring-2 ring-yellow-400"
-            >
-              <Image
-                src={`https://image.tmdb.org/t/p/original/${show.poster_path}`}
-                alt={`${show.name} poster`}
-                fill
-                priority
-                className="rounded-lg shadow-xl object-cover"
-              />
-            </Link>
-          </div>
-
-          {/* Show Details */}
-          <div className="relative text-salty-white flex ">
-            <Image
-              src={`https://image.tmdb.org/t/p/original/${show.backdrop_path}`}
-              fill
-              alt="backdrop path"
-              className="absolute z-0 object-cover"
-            />
-            <div className="absolute z-0 inset-0 bg-black/75"></div>
-            <div className="z-10 ">
-              <h1 className="text-[clamp(1.8rem,4vw,2.75rem)] font-bold mb-1 leading-tight">
-                {show.name}
-              </h1>
-              {show.name !== show.original_name && (
-                <p className="text-sm text-gray-300 italic mb-2">
-                  Original Title: {show.original_name}
-                </p>
-              )}
-
-              <ul className="text-sm space-y-1 mb-4">
-                <li>
-                  <span className="font-semibold">Genres:</span> {genreList}
-                </li>
-                <li>
-                  <span className="font-semibold">First Aired:</span>{" "}
-                  {show.first_air_date || "Unknown"}
-                </li>
-                <li>
-                  <span className="font-semibold">Last Aired:</span>{" "}
-                  {show.last_air_date || "Unknown"}
-                </li>
-                <li>
-                  <span className="font-semibold">Seasons:</span>{" "}
-                  {show.number_of_seasons ?? "?"} |{" "}
-                  <span className="font-semibold">Episodes:</span>{" "}
-                  {show.number_of_episodes ?? "?"}
-                </li>
-                <li>
-                  <span className="font-semibold">Language:</span>{" "}
-                  {show.original_language.toUpperCase()}
-                </li>
-                <li>
-                  <span className="font-semibold">Rating:</span>{" "}
-                  {show.vote_average.toFixed(1)} (
-                  {show.vote_count.toLocaleString()} votes)
-                </li>
-                {show.popularity && (
-                  <li>
-                    <span className="font-semibold">Popularity Score:</span>{" "}
-                    {Math.round(show.popularity)}
-                  </li>
-                )}
-              </ul>
-
-              <p className="text-sm leading-relaxed line-clamp-[10]  mb-6">
-                {show.overview || "No description available."}
-              </p>
-              <p className="text-sm">
-                {isLoggedIn ? "You are logged in" : "You are not logged in"}
-              </p>
-              <p className="text-sm">
-                {trackingInfo
-                  ? "Tracking information available"
-                  : "No tracking info"}
-              </p>
-
-              {/* <div className="flex items-center gap-4">
-            <TrackSidebar showId={id} showName={name} />
-            <Link
-              href={`https://www.themoviedb.org/tv/${id}`}
-              target="_blank"
-              className="text-sm underline decoration-theater-red decoration-2 underline-offset-4 hover:opacity-90"
-            >
-              View full TMDB page →
-            </Link>
-          </div> */}
-            </div>
-          </div>
-        </div>
-      </div>
-      {trackingInfo && (
-        <TrackingInfoForm trackingInfo={trackingInfo} showDetails={show} />
-      )}
-    </main>
+      <ShowDetailsContent
+        show={show}
+        trackingInfo={trackingInfo ?? undefined}
+      />
+    </div>
   );
 }
 

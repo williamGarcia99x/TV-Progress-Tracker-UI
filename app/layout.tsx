@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./Providers";
 import { Search } from "lucide-react";
 import SearchMedia from "@/components/ui/SearchMedia";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <meta name="viewport" content="initial-scale=1, width=device-width" />
       <body className={` antialiased`}>
+        <Toaster />
         {/* The Providers component wraps the children with the QueryClientProvider */}
         {/* to provide the query client context to the application. */}
         {/* It allows the use of React Query hooks in the children components. */}

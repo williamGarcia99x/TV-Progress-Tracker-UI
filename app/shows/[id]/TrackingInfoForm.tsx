@@ -6,7 +6,10 @@ import { createTracker, TrackerActionState } from "@/lib/trackerActions";
 import { UserTvTracker } from "@/lib/trackerService";
 import { cn } from "@/lib/utils";
 import { useActionState } from "react";
+import toast from "react-hot-toast";
 
+//TODO. Component should not re-render if there's an error with createTracker.
+//optimize this later.
 export function TrackingInfoForm({
   trackingInfo,
   showDetails,
@@ -14,12 +17,28 @@ export function TrackingInfoForm({
   trackingInfo: UserTvTracker;
   showDetails: ShowDetails;
 }) {
+  //To add toast notifications, we must make a helper function that has
+  //access to the prevState object and knows when the createTracker has begun, isPending, and isFinished
+  const formWithToast = async (
+    prevState: TrackerActionState,
+    form: FormData
+  ) => {
+    const toastId = toast.loading("Submitting tracking info ⏳");
+
+    //invoke server action! Pending state
+    const result = await createTracker(prevState, form);
+
+    if (result.error) {
+      toast.error(result.error, { id: toastId });
+    } else toast.success(result?.success as string, { id: toastId });
+
+    return result;
+  };
+
   const [state, formAction] = useActionState(
-    createTracker,
+    formWithToast,
     {} as TrackerActionState
   );
-
-  console.log(state.success ? state.success : state.error);
 
   //TODO If status is either watching || completed, hide the episodes watched and seasons watched inputs or make them
   //display N/A
@@ -28,7 +47,7 @@ export function TrackingInfoForm({
     <form action={formAction}>
       <div className="rounded-xl border border-gray-600 bg-gradient-to-br from-0% via-[#40330172] to-100% bg-black p-6 text-slate-100 backdrop-blur-md">
         <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
-        <ul className="flex flex-wrap gap-y-4 items-center mb-4">
+        <ul className="flex flex-wrap gap-y-4  mb-4">
           {/* Status (select) */}
           <input name="userId" hidden value={trackingInfo.userId} readOnly />
           <input name="showId" hidden value={trackingInfo.showId} readOnly />
@@ -55,7 +74,6 @@ export function TrackingInfoForm({
               <option value="COMPLETED">completed</option>
             </select>
           </Item>
-
           {/* Episodes Watched (number) */}
           <Item label="Episodes Watched:">
             <input
@@ -66,7 +84,6 @@ export function TrackingInfoForm({
               className=""
             />
           </Item>
-
           {/* Seasons Watched (number) */}
           <Item label="Seasons Watched:">
             <input
@@ -92,7 +109,6 @@ export function TrackingInfoForm({
               ))}
             </select>
           </Item>
-
           {/* Started At (date) */}
           <Item label="Started At:">
             <input
@@ -108,7 +124,6 @@ export function TrackingInfoForm({
               className=""
             />
           </Item>
-
           {/* Finished At (date) */}
           <Item label="Finished At:">
             <input
@@ -127,14 +142,17 @@ export function TrackingInfoForm({
         </ul>
 
         {/* Notes */}
-        {trackingInfo.notes && (
-          <div className="flex flex-col  ">
-            <label className="text-xl">
-              <span className="">Notes</span>
-            </label>
-            <textarea defaultValue={trackingInfo.notes} name="notes"></textarea>
-          </div>
-        )}
+
+        <div className="flex flex-col  ">
+          <label className="text-xl">
+            <span className="">Notes</span>
+          </label>
+          <textarea
+            defaultValue={trackingInfo.notes ?? ""}
+            name="notes"
+          ></textarea>
+        </div>
+
         <button
           type="submit"
           className="bg-gold-main text-cinematic-mocha p-2 rounded-md"

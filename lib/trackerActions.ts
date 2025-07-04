@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -24,10 +24,13 @@ export async function createTracker(
 ) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
+  const userId = cookieStore.get("userId")?.value;
 
   if (!token) {
     return { error: "You need to be logged in to track a show." };
   }
+
+  if (!userId) return { error: "Missing userId from request" };
 
   const body = {
     userTvTracker: formData
@@ -35,7 +38,7 @@ export async function createTracker(
       .reduce(
         (acc, [key, val]) =>
           !key.startsWith("$") ? { [key]: val.toString(), ...acc } : acc,
-        {}
+        { userId: userId }
       ),
     tvShow: {
       showId: formData.get("showId")?.toString(),
@@ -59,11 +62,18 @@ export async function createTracker(
   });
 
   if (!res.ok) {
+    if (res.status >= 500) {
+      return {
+        error: "An error occurred on our end 😢. Try again later.",
+      };
+    }
+
     const errorMessage = await res.text();
-    return { error: errorMessage };
+    return {
+      error: errorMessage,
+    };
   }
 
-  revalidatePath("/shows");
-
-  return { success: "Successfully tracked show" };
+  revalidateTag("tracker_data");
+  return { success: "Successfully tracked show ✅" };
 }
