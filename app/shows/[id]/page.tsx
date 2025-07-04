@@ -62,7 +62,7 @@ export default async function ShowDetailsPage({
 
   return (
     // Content for page
-    <main className="h-full flex justify-center items-center">
+    <main className="h-full ">
       {/* The flex settings do not apply to the element below because it's absolute */}
       <div className="absolute inset-0 -z-50">
         <Image
@@ -75,18 +75,14 @@ export default async function ShowDetailsPage({
         <div className="absolute inset-0 bg-black/70" />
       </div>
 
-      <div className="information-card">
+      <div className="information-card relative h-full w-full flex justify-center items-center ">
         {/* Show information Card. Centered on page */}
-        <div className="relative">
-          <Image
-            src={`https://image.tmdb.org/t/p/original/${show.backdrop_path}`}
-            fill
-            alt="backdrop path"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/70"></div>
-          <div className="relative flex w-full gap-10 ">
-            {/* Poster */}
+        {/* backdrop image in card */}
+        {/* This is centered on page thanks to the div.information-card  */}
+        <div className="relative flex justify-between   h-3/4 w-11/12">
+          {/* Poster */}
+          {/* adding w-full forces the div to take up the full width alloted to it from its flex parent */}
+          <div className="relative basis-[40%] shrink-0">
             <Link
               href={`https://www.themoviedb.org/tv/${show.id}`}
               target="_blank"
@@ -95,15 +91,23 @@ export default async function ShowDetailsPage({
               <Image
                 src={`https://image.tmdb.org/t/p/original/${show.poster_path}`}
                 alt={`${show.name} poster`}
-                width={280}
-                height={420}
+                fill
                 priority
-                className="rounded-lg shadow-xl object-cover h-auto w-[180px] md:w-[230px] lg:w-[280px]"
+                className="rounded-lg shadow-xl object-cover"
               />
             </Link>
+          </div>
 
-            {/* Show Details */}
-            <div className="text-salty-white max-h-full overflow-hidden flex flex-col justify-center">
+          {/* Show Details */}
+          <div className="relative text-salty-white flex ">
+            <Image
+              src={`https://image.tmdb.org/t/p/original/${show.backdrop_path}`}
+              fill
+              alt="backdrop path"
+              className="absolute z-0 object-cover"
+            />
+            <div className="absolute z-0 inset-0 bg-black/70"></div>
+            <div className="z-10 ">
               <h1 className="text-[clamp(1.8rem,4vw,2.75rem)] font-bold mb-1 leading-tight">
                 {show.name}
               </h1>
@@ -148,7 +152,7 @@ export default async function ShowDetailsPage({
                 )}
               </ul>
 
-              <p className="text-sm leading-relaxed line-clamp-[10] md:line-clamp-[12] mb-6">
+              <p className="text-sm leading-relaxed line-clamp-[10]  mb-6">
                 {show.overview || "No description available."}
               </p>
               <p className="text-sm">

@@ -138,6 +138,7 @@
   width: 75%;
   max-width: 1600px; /* or 1600px if preferred */
   min-width: 1000px;
+  min-height: 600px;
   margin-left: auto;
   margin-right: auto;
 }
