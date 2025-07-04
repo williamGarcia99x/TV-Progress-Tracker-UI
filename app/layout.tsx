@@ -25,7 +25,7 @@ export default function RootLayout({
           <div className="relative min-h-screen grid grid-rows-[auto_1fr] ">
             {/* Include a header that has the Title of the app and logo. It should not be constrained
           by the app-wrapper*/}
-            <header className="bg-navy-blue   text-white p-4 flex items-center justify-between">
+            <header className="bg-navy-blue   text-white p-4 flex items-center justify-between ">
               <h1 className="text-2xl  font-bold">TV Progress Tracker</h1>
               <SearchMedia />
             </header>

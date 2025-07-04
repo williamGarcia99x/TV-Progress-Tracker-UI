@@ -7,6 +7,10 @@ import { getShowDetails, ShowDetails } from "@/lib/tmdb";
 import { cookies } from "next/headers";
 import { get } from "http";
 import { getTrackingByUserAndShow, UserTvTracker } from "@/lib/trackerService";
+import { cn } from "@/lib/utils";
+import { TrackingInfoForm } from "./TrackingInfoForm";
+import { createTracker } from "@/lib/trackerActions";
+import { useFormState, useFormStatus } from "react-dom";
 
 // ---------- helpers ----------
 
@@ -62,9 +66,9 @@ export default async function ShowDetailsPage({
 
   return (
     // Content for page
-    <main className="h-full ">
+    <main className="h-full">
       {/* The flex settings do not apply to the element below because it's absolute */}
-      <div className="absolute inset-0 -z-50">
+      <div className="page-background fixed inset-0 -z-50">
         <Image
           src={`https://image.tmdb.org/t/p/original/${show.backdrop_path}`}
           alt="backdrop blur background"
@@ -106,7 +110,7 @@ export default async function ShowDetailsPage({
               alt="backdrop path"
               className="absolute z-0 object-cover"
             />
-            <div className="absolute z-0 inset-0 bg-black/70"></div>
+            <div className="absolute z-0 inset-0 bg-black/75"></div>
             <div className="z-10 ">
               <h1 className="text-[clamp(1.8rem,4vw,2.75rem)] font-bold mb-1 leading-tight">
                 {show.name}
@@ -178,6 +182,85 @@ export default async function ShowDetailsPage({
           </div>
         </div>
       </div>
+      {trackingInfo && (
+        <TrackingInfoForm trackingInfo={trackingInfo} showDetails={show} />
+      )}
     </main>
   );
 }
+
+// function TrackingInfo({ trackingInfo }: { trackingInfo: UserTvTracker }) {
+//   const infoItems = [
+//     {
+//       label: "Status:",
+//       value: trackingInfo.status,
+//     },
+//     {
+//       label: "Episodes Watched:",
+//       value: trackingInfo.episodesWatched?.toString() ?? "N/A",
+//     },
+//     {
+//       label: "Seasons Watched:",
+//       value: trackingInfo.currentSeason?.toString() ?? "N/A",
+//     },
+//     {
+//       label: "Personal Rating:",
+//       value: trackingInfo.userRating?.toString() ?? "N/A",
+//     },
+//     {
+//       label: "Started At:",
+//       value: trackingInfo.dateStarted
+//         ? new Date(trackingInfo.dateStarted).toLocaleDateString()
+//         : "N/A",
+//     },
+//     {
+//       label: "Finished At:",
+//       value: trackingInfo.dateCompleted
+//         ? new Date(trackingInfo.dateCompleted).toLocaleDateString()
+//         : "N/A",
+//     },
+//   ];
+
+//   return (
+//     <div className="rounded-xl border border-gray-600 bg-gradient-to-br from-0% via-[#40330172] to-100% bg-black   p-6 text-slate-100  backdrop-blur-md">
+//       <h3 className="text-3xl font-bold mb-4 ">Your Tracking</h3>
+//       <ul className="flex flex-wrap gap-y-4">
+//         {infoItems.map((item, idx) => (
+//           <ListItem
+//             key={idx}
+//             label={item.label}
+//             value={item.value}
+//             className="basis-1/3 text-xl"
+//           />
+//         ))}
+//       </ul>
+//       {trackingInfo.notes && (
+//         <div className="mt-6">
+//           <span className="font-semibold ">Notes:</span>
+//           <div className="whitespace-pre-line mt-2 text-sm bg-slate-800/60 text-slate-200 rounded p-3 border border-slate-700">
+//             {trackingInfo.notes}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// function ListItem({
+//   label,
+//   value,
+//   className = "",
+// }: {
+//   label: string;
+//   value: string;
+//   className?: string;
+// }) {
+//   return (
+//     <li className={` ${className}`}>
+//       <span className="leading-snug ">
+//         <span className="font-medium">{label}</span>
+//         <span className="text-slate-200 ml-1">{value}</span>
+//       </span>
+//     </li>
+//   );
+// }

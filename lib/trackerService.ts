@@ -12,40 +12,40 @@ const baseUrl = `${backendUrl}/tracker`;
  */
 export interface UserTvTracker {
   /** Auto‑increment primary key */
-  tracker_id: number;
+  trackerId: number;
 
   /** FK → users.id (always present) */
-  user_id: number;
+  userId: number;
 
   /** FK → shows.id (TMDB or local) */
-  show_id: number;
+  showId: number;
 
   /** Current progress state */
-  watch_status: "PLANNING" | "WATCHING" | "COMPLETED";
+  status: "PLANNING" | "WATCHING" | "COMPLETED";
 
   /** Episodes watched so far (can be null / undefined if unknown) */
-  episodes_watched: number | null;
+  episodesWatched: number | null;
 
   /** Season the user is currently on */
-  current_season: number | null;
+  currentSeason: number | null;
 
   /**
    * Personal rating 1.0 – 10.0
    * (nullable until the user rates)
    */
-  user_rating: number | null;
+  userRating: number | null;
 
   /** Free‑form personal notes */
   notes: string | null;
 
   /** When the tracker entry was created */
-  date_added: Date | string; // TIMESTAMP defaults to now
+  dateAdded: Date | string; // TIMESTAMP defaults to now
 
   /** When the user started watching (nullable) */
-  date_started?: Date | string | null;
+  dateStarted?: Date | string | null;
 
   /** When the user finished the show (nullable) */
-  date_completed?: Date | string | null;
+  dateCompleted?: Date | string | null;
 }
 
 export const getTrackingByUserAndShow = async (
