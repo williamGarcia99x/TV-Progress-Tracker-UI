@@ -5,7 +5,7 @@ import { ShowDetails } from "@/lib/tmdb";
 import { createTracker, TrackerActionState } from "@/lib/trackerActions";
 import { UserTvTracker } from "@/lib/trackerService";
 import { cn } from "@/lib/utils";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import toast from "react-hot-toast";
 
 //TODO. Component should not re-render if there's an error with createTracker.
@@ -17,6 +17,7 @@ export function TrackingInfoForm({
   trackingInfo: UserTvTracker;
   showDetails: ShowDetails;
 }) {
+  const [status, setStatus] = useState(trackingInfo.status);
   //To add toast notifications, we must make a helper function that has
   //access to the prevState object and knows when the createTracker has begun, isPending, and isFinished
   const formWithToast = async (
@@ -66,83 +67,87 @@ export function TrackingInfoForm({
           <Item label="Status:">
             <select
               name="status"
-              defaultValue={trackingInfo.status}
-              className="s"
+              value={status}
+              onChange={(e) =>
+                setStatus(e.target.value as UserTvTracker["status"])
+              }
             >
               <option value="PLANNING">planning</option>
               <option value="WATCHING">watching</option>
               <option value="COMPLETED">completed</option>
             </select>
           </Item>
-          {/* Episodes Watched (number) */}
-          <Item label="Episodes Watched:">
-            <input
-              type="number"
-              min={0}
-              name="episodesWatched"
-              defaultValue={trackingInfo.episodesWatched ?? ""}
-              className=""
-            />
-          </Item>
-          {/* Seasons Watched (number) */}
-          <Item label="Seasons Watched:">
-            <input
-              type="number"
-              name="currentSeason"
-              defaultValue={trackingInfo.currentSeason ?? ""}
-              className=""
-            />
-          </Item>
+          {
+            <>
+              <Item label="Episodes Watched:">
+                <input
+                  className={cn("hidden", status !== "PLANNING" && "block")}
+                  type="number"
+                  min={0}
+                  name="episodesWatched"
+                  defaultValue={trackingInfo.episodesWatched ?? ""}
+                />
+              </Item>
+              {/* Seasons Watched (number) */}
+              <Item label="Seasons Watched:">
+                <input
+                  className={cn("hidden", status !== "PLANNING" && "block")}
+                  type="number"
+                  name="currentSeason"
+                  defaultValue={trackingInfo.currentSeason ?? ""}
+                />
+              </Item>
 
-          {/* Personal Rating (select 1‑10) */}
-          <Item label="Personal Rating:">
-            <select
-              name="userRating"
-              defaultValue={trackingInfo.userRating ?? ""}
-              className=""
-            >
-              <option value="">N/A</option>
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </Item>
-          {/* Started At (date) */}
-          <Item label="Started At:">
-            <input
-              type="date"
-              name="dateStarted"
-              defaultValue={
-                trackingInfo.dateStarted
-                  ? new Date(trackingInfo.dateStarted)
-                      .toISOString()
-                      .substring(0, 10)
-                  : ""
-              }
-              className=""
-            />
-          </Item>
-          {/* Finished At (date) */}
-          <Item label="Finished At:">
-            <input
-              type="date"
-              name="dateCompleted"
-              defaultValue={
-                trackingInfo.dateCompleted
-                  ? new Date(trackingInfo.dateCompleted)
-                      .toISOString()
-                      .substring(0, 10)
-                  : ""
-              }
-              className=""
-            />
-          </Item>
+              {/* Personal Rating (select 1‑10) */}
+              <Item label="Personal Rating:">
+                <select
+                  className={cn("hidden", status !== "PLANNING" && "block")}
+                  name="userRating"
+                  defaultValue={trackingInfo.userRating ?? ""}
+                >
+                  <option value="">N/A</option>
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </Item>
+              {/* Started At (date) */}
+              <Item label="Started At:">
+                <input
+                  className={cn("hidden", status !== "PLANNING" && "block")}
+                  type="date"
+                  name="dateStarted"
+                  defaultValue={
+                    trackingInfo.dateStarted
+                      ? new Date(trackingInfo.dateStarted)
+                          .toISOString()
+                          .substring(0, 10)
+                      : ""
+                  }
+                />
+              </Item>
+              {/* Finished At (date) */}
+              <Item label="Finished At:">
+                <input
+                  className={cn("hidden", status !== "PLANNING" && "block")}
+                  type="date"
+                  name="dateCompleted"
+                  defaultValue={
+                    trackingInfo.dateCompleted
+                      ? new Date(trackingInfo.dateCompleted)
+                          .toISOString()
+                          .substring(0, 10)
+                      : ""
+                  }
+                />
+              </Item>
+            </>
+          }
         </ul>
 
         {/* Notes */}
-
         <div className="flex flex-col  ">
           <label className="text-xl">
             <span className="">Notes</span>

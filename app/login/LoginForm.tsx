@@ -3,7 +3,7 @@
 import { AuthForm } from "@/components/AuthForm";
 import useAuthMutation, { AuthResponse } from "@/lib/hooks/useAuthMutation";
 import { GalleryVerticalEnd } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 async function storeSessionAsCookie({
@@ -26,11 +26,12 @@ async function storeSessionAsCookie({
 }
 
 function LoginForm() {
+  const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const { isPending, mutateAsync: loginUser } = useAuthMutation("login");
 
-  //Function that is excuted when the user submits the login form.
+  //Function that is executed when the user submits the login form.
   //It calls the loginUser function from the useAuthMutation hook and handles the response.
   //If the login is successful, it stores the session as a cookie and redirects the user to the home page.
   //If the login fails, it sets the error message to be displayed to the user.
@@ -49,8 +50,12 @@ function LoginForm() {
       //At this point, the session is an object containing the token and userId.
       await storeSessionAsCookie(session as AuthResponse);
 
-      //If the cookies are set successfully, only then redirect the user.
-      router.push("/"); // Redirect users to the home page.
+      const redirectToUrl = searchParams.get("next");
+      if (redirectToUrl) {
+        router.replace(redirectToUrl);
+      } else {
+        router.push("/");
+      }
     } catch (error: any) {
       setErrorMessage(error.message);
       // Handle login error (e.g., show an error message)

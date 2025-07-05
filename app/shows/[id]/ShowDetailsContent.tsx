@@ -6,18 +6,19 @@ import Link from "next/link";
 import { TrackingInfoForm } from "./TrackingInfoForm";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 function ShowDetailsContent({
   show,
   trackingInfo,
+  isLoggedIn,
 }: {
   show: ShowDetails;
-  trackingInfo?: UserTvTracker;
+  trackingInfo: UserTvTracker | null;
+  isLoggedIn: boolean;
 }) {
-  const [showForm, setShowForm] = useState(() =>
-    trackingInfo === undefined ? false : true
-  );
-
+  const [showForm, setShowForm] = useState(() => (trackingInfo ? true : false));
+  const router = useRouter();
   const trackerId = trackingInfo?.trackerId || 0;
   const tvTrackerInput: UserTvTracker = trackingInfo
     ? trackingInfo
@@ -34,6 +35,17 @@ function ShowDetailsContent({
         dateStarted: null,
         dateCompleted: null,
       };
+
+  const handleTrackClick = () => {
+    if (!isLoggedIn) {
+      //redirect components are meant for Server components or Route handlers
+      //redirect("/login");
+      router.push(`/login?next=/shows/${show.id}`); // adds entry to history
+      return;
+    }
+
+    setShowForm(true);
+  };
 
   return (
     <>
@@ -119,17 +131,15 @@ function ShowDetailsContent({
               <p className="text-sm leading-relaxed line-clamp-[10]  mb-6">
                 {show.overview || "No description available."}
               </p>
-              <p className="text-sm">
-                {trackingInfo
-                  ? "Tracking information available"
-                  : "No tracking info"}
-              </p>
+              {/* If user is not logged in, clicking the Track button should redirect users to the login
+              page.  */}
+
               <button
                 className={cn(
                   "bg-gold-main p-2 rounded-lg text-black block hover:cursor-pointer",
                   (trackingInfo || showForm) && "hidden"
                 )}
-                onClick={() => setShowForm(true)}
+                onClick={handleTrackClick}
               >
                 Track
               </button>

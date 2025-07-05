@@ -1,5 +1,6 @@
 "use server";
 
+import { error } from "console";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -22,6 +23,7 @@ export async function createTracker(
   prevState: TrackerActionState,
   formData: FormData
 ) {
+  console.log(formData);
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const userId = cookieStore.get("userId")?.value;

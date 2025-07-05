@@ -1,16 +1,11 @@
 // app/shows/[id]/page.tsx
 import Image from "next/image";
-import Link from "next/link";
+
 import { notFound } from "next/navigation";
 // import TrackSidebar from "./TrackSidebar";
 import { getShowDetails, ShowDetails } from "@/lib/tmdb";
 import { cookies } from "next/headers";
-import { get } from "http";
 import { getTrackingByUserAndShow, UserTvTracker } from "@/lib/trackerService";
-import { cn } from "@/lib/utils";
-import { TrackingInfoForm } from "./TrackingInfoForm";
-import { createTracker } from "@/lib/trackerActions";
-import { useFormState, useFormStatus } from "react-dom";
 import ShowDetailsContent from "./ShowDetailsContent";
 
 // ---------- helpers ----------
@@ -42,9 +37,6 @@ export default async function ShowDetailsPage({
         showId,
         cookieStore.get("token")?.value as string
       );
-
-      console.log("TrackingInfo inside ShowDetailsPage");
-      console.log(trackingInfo);
     }
   } catch (error) {
     //The notFound page should display the error message passed
@@ -56,14 +48,7 @@ export default async function ShowDetailsPage({
 
   //as long as the show exists, we return the page
 
-  //Need fallbacks for backdrop and poster images. Will do later
-  //   // ----- FALLBACKS -----
-  //   const backdropURL = show.backdrop_path
-  //     ? TMDB_IMG(show.backdrop_path, "w1280")
-  //     : "/fallback-backdrop.jpg";
-  //   const posterURL = show.poster_path
-  //     ? TMDB_IMG(show.poster_path, "w500")
-  //     : "/fallback-poster.jpg";
+  //TODO Need fallbacks for backdrop and poster images. Will do later
 
   return (
     // Content for page
@@ -82,7 +67,8 @@ export default async function ShowDetailsPage({
 
       <ShowDetailsContent
         show={show}
-        trackingInfo={trackingInfo ?? undefined}
+        trackingInfo={trackingInfo}
+        isLoggedIn={isLoggedIn}
       />
     </div>
   );
