@@ -1,15 +1,55 @@
 /* ---------- TrackingInfo.tsx ---------- */
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { ShowDetails } from "@/lib/tmdb";
 import { createTracker, TrackerActionState } from "@/lib/trackerActions";
 import { UserTvTracker } from "@/lib/trackerService";
 import { cn } from "@/lib/utils";
-import { useActionState, useState } from "react";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-//TODO. Component should not re-render if there's an error with createTracker.
-//optimize this later.
+type Inputs = {
+  trackerId: number;
+  userId: number;
+  showId: number;
+  status: "PLANNING" | "WATCHING" | "COMPLETED";
+  episodesWatched: number | "";
+  currentSeason: number | "";
+  userRating: number | "";
+  dateStarted: string;
+  dateCompleted: string;
+  notes: string;
+};
+
+function calculateDefaultFormInput(
+  trackingInfo: UserTvTracker,
+  showId: number
+): Inputs {
+  return {
+    trackerId: trackingInfo.trackerId,
+    userId: trackingInfo.userId,
+    showId: showId,
+    status: trackingInfo.status,
+    episodesWatched: trackingInfo.episodesWatched ?? "",
+    currentSeason: trackingInfo.currentSeason ?? "",
+    userRating: trackingInfo.userRating ?? 0,
+    dateStarted: trackingInfo.dateStarted?.toString().slice(0, 10) ?? "",
+    dateCompleted: trackingInfo.dateCompleted?.toString().slice(0, 10) ?? "",
+    notes: trackingInfo.notes ?? "",
+  };
+}
+
+// trackingInfo is the input data meant to be the defaultValues
 export function TrackingInfoForm({
   trackingInfo,
   showDetails,
@@ -17,155 +57,196 @@ export function TrackingInfoForm({
   trackingInfo: UserTvTracker;
   showDetails: ShowDetails;
 }) {
-  const [status, setStatus] = useState(trackingInfo.status);
-  //To add toast notifications, we must make a helper function that has
-  //access to the prevState object and knows when the createTracker has begun, isPending, and isFinished
-  const formWithToast = async (
-    prevState: TrackerActionState,
-    form: FormData
-  ) => {
+  const [isInitialRender, setIsInitialRender] = useState(true);
+  //If a user is not tracking a show, these values will be the default values.
+  //If a user switches Status to planning from either watching or completed, set all fields to their default values
+  // initial defaults
+  const defaults = calculateDefaultFormInput(trackingInfo, showDetails.id);
+
+  //useForm hook from react-hook-form. You must specify the schema of form data using generics
+  const form = useForm<Inputs>({
+    defaultValues: defaults,
+  });
+
+  const status = form.watch("status");
+
+  //Executes on submission of form after successful form validation
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    console.log("ON CLIENT onSubmit, ");
+    console.log(data);
     const toastId = toast.loading("Submitting tracking info ⏳");
+    const fd = new FormData();
+
+    //For each property in the data args object, append it to the fd FormData object. This is what gets passed to the server action
+    Object.entries(data).forEach(([key, val]) => fd.append(key, String(val)));
+
+    //Add hidden fields
+    fd.append("originalName", showDetails.original_name);
+    fd.append(
+      "genreIds",
+      showDetails.genres.map((genre) => genre.id).join(",")
+    );
 
     //invoke server action! Pending state
-    const result = await createTracker(prevState, form);
+    const result: TrackerActionState = await createTracker({}, fd);
 
     if (result.error) {
       toast.error(result.error, { id: toastId });
     } else toast.success(result?.success as string, { id: toastId });
-
-    return result;
   };
 
-  const [state, formAction] = useActionState(
-    formWithToast,
-    {} as TrackerActionState
-  );
-
-  //TODO If status is either watching || completed, hide the episodes watched and seasons watched inputs or make them
-  //display N/A
+  useEffect(() => {
+    //We want to reset the status if it changes to "Planning"
+    if (isInitialRender) {
+      setIsInitialRender(false);
+      return;
+    }
+    if (status === "PLANNING") {
+      form.reset({
+        ...calculateDefaultFormInput(trackingInfo, showDetails.id),
+        notes: form.getValues("notes"),
+      });
+    }
+  }, [status, isInitialRender, form, showDetails.id, trackingInfo]);
 
   return (
-    <form action={formAction}>
-      <div className="rounded-xl border border-gray-600 bg-gradient-to-br from-0% via-[#40330172] to-100% bg-black p-6 text-slate-100 backdrop-blur-md">
-        <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
-        <ul className="flex flex-wrap gap-y-4  mb-4">
-          {/* Status (select) */}
-          <input name="userId" hidden value={trackingInfo.userId} readOnly />
-          <input name="showId" hidden value={trackingInfo.showId} readOnly />
-          <input
-            name="originalName"
-            hidden
-            value={showDetails.original_name}
-            readOnly
-          />
-          <input
-            name="genreIds"
-            hidden
-            value={showDetails.genres.map((genre) => genre.id.toString())}
-            readOnly
-          />
-          <Item label="Status:">
-            <select
-              name="status"
-              value={status}
-              onChange={(e) =>
-                setStatus(e.target.value as UserTvTracker["status"])
-              }
-            >
-              <option value="PLANNING">planning</option>
-              <option value="WATCHING">watching</option>
-              <option value="COMPLETED">completed</option>
-            </select>
-          </Item>
-          {
-            <>
-              <Item label="Episodes Watched:">
-                <input
-                  className={cn("hidden", status !== "PLANNING" && "block")}
-                  type="number"
-                  min={0}
-                  name="episodesWatched"
-                  defaultValue={trackingInfo.episodesWatched ?? ""}
-                />
-              </Item>
-              {/* Seasons Watched (number) */}
-              <Item label="Seasons Watched:">
-                <input
-                  className={cn("hidden", status !== "PLANNING" && "block")}
-                  type="number"
-                  name="currentSeason"
-                  defaultValue={trackingInfo.currentSeason ?? ""}
-                />
-              </Item>
+    <Form {...form}>
+      {/* first arguments passed to handleSubmit is the callback to execute after successful validation */}
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="rounded-xl border border-gray-600 bg-gradient-to-br from-0% via-[#40330172] to-100% bg-black p-6 text-slate-100 backdrop-blur-md">
+          <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
 
-              {/* Personal Rating (select 1‑10) */}
-              <Item label="Personal Rating:">
-                <select
-                  className={cn("hidden", status !== "PLANNING" && "block")}
-                  name="userRating"
-                  defaultValue={trackingInfo.userRating ?? ""}
-                >
-                  <option value="">N/A</option>
-                  {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
-                </select>
-              </Item>
-              {/* Started At (date) */}
-              <Item label="Started At:">
-                <input
-                  className={cn("hidden", status !== "PLANNING" && "block")}
-                  type="date"
-                  name="dateStarted"
-                  defaultValue={
-                    trackingInfo.dateStarted
-                      ? new Date(trackingInfo.dateStarted)
-                          .toISOString()
-                          .substring(0, 10)
-                      : ""
-                  }
-                />
-              </Item>
-              {/* Finished At (date) */}
-              <Item label="Finished At:">
-                <input
-                  className={cn("hidden", status !== "PLANNING" && "block")}
-                  type="date"
-                  name="dateCompleted"
-                  defaultValue={
-                    trackingInfo.dateCompleted
-                      ? new Date(trackingInfo.dateCompleted)
-                          .toISOString()
-                          .substring(0, 10)
-                      : ""
-                  }
-                />
-              </Item>
-            </>
-          }
-        </ul>
+          {/* Status */}
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <select {...field}>
+                    <option value="PLANNING">planning</option>
+                    <option value="WATCHING">watching</option>
+                    <option value="COMPLETED">completed</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Notes */}
-        <div className="flex flex-col  ">
-          <label className="text-xl">
-            <span className="">Notes</span>
-          </label>
-          <textarea
-            defaultValue={trackingInfo.notes ?? ""}
+          {/* Episodes Watched */}
+          <FormField
+            control={form.control}
+            name="episodesWatched"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>Episodes Watched</FormLabel>
+                <FormControl>
+                  <input
+                    type="number"
+                    min={0}
+                    {...field}
+                    disabled={status === "PLANNING"}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Seasons Watched */}
+          <FormField
+            control={form.control}
+            name="currentSeason"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>Seasons Watched</FormLabel>
+                <FormControl>
+                  <input
+                    type="number"
+                    {...field}
+                    disabled={status === "PLANNING"}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Personal Rating */}
+          <FormField
+            control={form.control}
+            name="userRating"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>Personal Rating</FormLabel>
+                <FormControl>
+                  <select {...field} disabled={status === "PLANNING"}>
+                    <option value={0}>N/A</option>
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Started / Finished */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="dateStarted"
+              render={({ field }) => (
+                <FormItem className="basis-1/2">
+                  <FormLabel>Started At</FormLabel>
+                  <FormControl>
+                    <input
+                      type="date"
+                      {...field}
+                      disabled={status === "PLANNING"}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dateCompleted"
+              render={({ field }) => (
+                <FormItem className="basis-1/2">
+                  <FormLabel>Finished At</FormLabel>
+                  <FormControl>
+                    <input
+                      type="date"
+                      {...field}
+                      disabled={status === "PLANNING"}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Notes */}
+          <FormField
+            control={form.control}
             name="notes"
-          ></textarea>
-        </div>
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <textarea {...field} disabled={status === "PLANNING"} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <button
-          type="submit"
-          className="bg-gold-main text-cinematic-mocha p-2 rounded-md"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
+          <Button type="submit">Submit</Button>
+        </div>
+      </form>
+    </Form>
   );
 }
 
