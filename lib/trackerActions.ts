@@ -32,20 +32,28 @@ export async function createTracker(
 
   if (!userId) return { error: "Missing userId from request" };
 
+  const posterPathDirty = formData.get("posterPath")?.toString() as string;
+  const posterPathClean = posterPathDirty.startsWith("/")
+    ? posterPathDirty.substring(1)
+    : posterPathDirty;
+
   const body = {
     userTvTracker: {
-      ...Object.fromEntries(
-        formData
-          .entries()
-          .filter(
-            ([k, v]) => k !== "genreIds" && k !== "originalName" && [k, v]
-          )
-      ),
       userId,
+      showId: formData.get("showId")?.toString(),
+      status: formData.get("status")?.toString(), // "planning" | "watching" | "completed"
+      episodesWatched: formData.get("episodesWatched")?.toString(),
+      currentSeason: formData.get("currentSeason")?.toString(),
+      userRating: formData.get("userRating")?.toString(),
+      notes: formData.get("notes")?.toString(),
+      dateStarted: formData.get("dateStarted")?.toString(),
+      dateCompleted: formData.get("dateCompleted")?.toString(),
     },
     tvShow: {
-      showId: formData.get("showId")?.toString(),
-      originalName: formData.get("originalName")?.toString(),
+      id: formData.get("showId")?.toString(),
+      name: formData.get("name")?.toString(),
+      original_name: formData.get("originalName")?.toString(),
+      poster_path: posterPathClean,
       genreIds: formData
         .get("genreIds")
         ?.toString()
@@ -53,6 +61,7 @@ export async function createTracker(
         .map((id) => Number(id)),
     },
   };
+  console.log(body);
 
   const res = await fetch(backendUrl, {
     method: "POST",
@@ -72,11 +81,12 @@ export async function createTracker(
     }
 
     const errorMessage = await res.text();
+
     return {
       error: errorMessage,
     };
   }
-
+  console.log(body);
   revalidateTag("tracker_data");
   return { success: "Successfully tracked show 🚀" };
 }
@@ -96,26 +106,17 @@ export async function updateTracker(
   if (!userId) return { error: "Missing userId from request" };
 
   const body = {
-    ...Object.fromEntries(
-      formData
-        .entries()
-        .filter(([k, v]) => k !== "genreIds" && k !== "originalName" && [k, v])
-    ),
     userId,
-
-    //The information below is not needed when updating a tracking
-    // tvShow: {
-    //   showId: formData.get("showId")?.toString(),
-    //   originalName: formData.get("originalName")?.toString(),
-    //   genreIds: formData
-    //     .get("genreIds")
-    //     ?.toString()
-    //     .split(",")
-    //     .map((id) => Number(id)),
-    // },
+    trackerId: formData.get("trackerId")?.toString(),
+    showId: formData.get("showId")?.toString(),
+    status: formData.get("status")?.toString(), // "planning" | "watching" | "completed"
+    episodesWatched: formData.get("episodesWatched")?.toString(),
+    currentSeason: formData.get("currentSeason")?.toString(),
+    userRating: formData.get("userRating")?.toString(),
+    notes: formData.get("notes")?.toString(),
+    dateStarted: formData.get("dateStarted")?.toString(),
+    dateCompleted: formData.get("dateCompleted")?.toString(),
   };
-  console.log("IN UPDATE TRACKING");
-  console.log(body);
 
   const res = await fetch(`${backendUrl}/${body.showId}`, {
     method: "PUT",

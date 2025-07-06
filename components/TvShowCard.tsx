@@ -19,9 +19,9 @@ function TvShowCard({ show }: { show: ShowSummary }) {
           <Image
             alt={`${show.name} Poster`}
             src={`https://image.tmdb.org/t/p/original/${show.poster_path}`}
-            className="rounded-md "
+            className="rounded-md object-cover "
             fill
-            objectFit="cover"
+            sizes="150x255"
           />
         </div>
       </CardContent>

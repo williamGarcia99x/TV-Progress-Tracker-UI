@@ -64,8 +64,6 @@ export const getTrackingByUserAndShow = async (
   url.searchParams.append("user-id", userId);
   url.searchParams.append("show-id", showId);
 
-  console.log(url.toString());
-
   const res = await fetch(url.toString(), {
     method: "GET",
     headers: {
