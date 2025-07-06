@@ -1,5 +1,6 @@
 /* ---------- TrackingInfo.tsx ---------- */
 "use client";
+import isEqual from "lodash/isEqual";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +12,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ShowDetails } from "@/lib/tmdb";
-import { createTracker, TrackerActionState } from "@/lib/trackerActions";
+import {
+  createTracker,
+  TrackerActionState,
+  updateTracker,
+} from "@/lib/trackerActions";
 import { UserTvTracker } from "@/lib/trackerService";
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -32,34 +36,49 @@ type Inputs = {
 };
 
 function calculateDefaultFormInput(
-  trackingInfo: UserTvTracker,
+  trackingInfo: UserTvTracker | null,
   showId: number
 ): Inputs {
+  //user is already updating the show. Defaults come from the given trackingInfo object.
+
   return {
-    trackerId: trackingInfo.trackerId,
-    userId: trackingInfo.userId,
+    trackerId: trackingInfo?.trackerId ?? Number.MIN_VALUE,
+    userId: trackingInfo?.userId ?? Number.MIN_VALUE,
     showId: showId,
-    status: trackingInfo.status,
-    episodesWatched: trackingInfo.episodesWatched ?? "",
-    currentSeason: trackingInfo.currentSeason ?? "",
-    userRating: trackingInfo.userRating ?? 0,
-    dateStarted: trackingInfo.dateStarted?.toString().slice(0, 10) ?? "",
-    dateCompleted: trackingInfo.dateCompleted?.toString().slice(0, 10) ?? "",
-    notes: trackingInfo.notes ?? "",
+    status: trackingInfo?.status ?? "PLANNING",
+    episodesWatched: trackingInfo?.episodesWatched ?? "",
+    currentSeason: trackingInfo?.currentSeason ?? "",
+    userRating: trackingInfo?.userRating ?? "",
+    dateStarted: trackingInfo?.dateStarted?.toString().slice(0, 10) ?? "",
+    dateCompleted: trackingInfo?.dateCompleted?.toString().slice(0, 10) ?? "",
+    notes: trackingInfo?.notes ?? "",
   };
 }
 
-// trackingInfo is the input data meant to be the defaultValues
+//If user is already tracking a show, they cannot change status to planning. If they do, they need to delete the tracker first and then,
+//submit a new tracking request.
+
+//TrackingInfo passed as props is always a truthy value. From that, there is no way for us to know if a user is tracking a show.
+//We can make TrackingInfo an optional value. If the value is not given, then we can know if a user is tracking the show or not.
+//If the user is not tracking the show, then we know the user wants to Add a tracking. If the user is tracking the show, then we know
+//they may/may not be interested in Editing a tracking. Depending on this condition the following behavior is executed.
+/**
+ * If already tracking
+ *  - Submit button should say, Edit
+ *  - Clicking the submit button should execute updateTracking
+ * If not tracking
+ *  - Submit button should say Track
+ *  - clicking the submit button should execute createTracker.
+ */
 export function TrackingInfoForm({
   trackingInfo,
   showDetails,
 }: {
-  trackingInfo: UserTvTracker;
+  trackingInfo: UserTvTracker | null;
   showDetails: ShowDetails;
 }) {
   const [isInitialRender, setIsInitialRender] = useState(true);
   //If a user is not tracking a show, these values will be the default values.
-  //If a user switches Status to planning from either watching or completed, set all fields to their default values
   // initial defaults
   const defaults = calculateDefaultFormInput(trackingInfo, showDetails.id);
 
@@ -72,8 +91,18 @@ export function TrackingInfoForm({
 
   //Executes on submission of form after successful form validation
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log("ON CLIENT onSubmit, ");
-    console.log(data);
+    //if the user is tracking the show but the form info hasn't changed, don't invoke the server action.
+    if (
+      trackingInfo &&
+      isEqual(
+        form.getValues(),
+        calculateDefaultFormInput(trackingInfo, showDetails.id)
+      )
+    ) {
+      toast("No changes made 🙂");
+      return;
+    }
+
     const toastId = toast.loading("Submitting tracking info ⏳");
     const fd = new FormData();
 
@@ -87,8 +116,11 @@ export function TrackingInfoForm({
       showDetails.genres.map((genre) => genre.id).join(",")
     );
 
-    //invoke server action! Pending state
-    const result: TrackerActionState = await createTracker({}, fd);
+    //invoke server action
+    const result: TrackerActionState =
+      trackingInfo === null
+        ? await createTracker({}, fd)
+        : await updateTracker({}, fd);
 
     if (result.error) {
       toast.error(result.error, { id: toastId });
@@ -103,8 +135,11 @@ export function TrackingInfoForm({
     }
     if (status === "PLANNING") {
       form.reset({
+        //Including the defaults objects here would force me to memoize it, otherwise this useEffect would execute on every re-render.
+        //Instead, we use the helper function below
         ...calculateDefaultFormInput(trackingInfo, showDetails.id),
         notes: form.getValues("notes"),
+        status: "PLANNING",
       });
     }
   }, [status, isInitialRender, form, showDetails.id, trackingInfo]);
@@ -113,9 +148,8 @@ export function TrackingInfoForm({
     <Form {...form}>
       {/* first arguments passed to handleSubmit is the callback to execute after successful validation */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="rounded-xl border border-gray-600 bg-gradient-to-br from-0% via-[#40330172] to-100% bg-black p-6 text-slate-100 backdrop-blur-md">
+        <div className="rounded-xl border  bg-gray-950/50   p-6 text-slate-100 backdrop-blur-md">
           <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
-
           {/* Status */}
           <FormField
             control={form.control}
@@ -126,6 +160,7 @@ export function TrackingInfoForm({
                 <FormControl>
                   <select {...field}>
                     <option value="PLANNING">planning</option>
+
                     <option value="WATCHING">watching</option>
                     <option value="COMPLETED">completed</option>
                   </select>
@@ -181,7 +216,7 @@ export function TrackingInfoForm({
                 <FormLabel>Personal Rating</FormLabel>
                 <FormControl>
                   <select {...field} disabled={status === "PLANNING"}>
-                    <option value={0}>N/A</option>
+                    <option value={""}>N/A</option>
                     {Array.from({ length: 10 }, (_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}
@@ -242,32 +277,11 @@ export function TrackingInfoForm({
               </FormItem>
             )}
           />
-
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="">
+            {trackingInfo ? "Edit" : "Track"}
+          </Button>
         </div>
       </form>
     </Form>
-  );
-}
-
-function Item({
-  label,
-  children,
-  as,
-  className,
-}: {
-  label: string;
-  as?: React.ElementType;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const Component = as || "li";
-  return (
-    <Component className={cn("text-xl basis-1/3 space-x-2", className)}>
-      <label className="">
-        <span className="">{label}</span>
-      </label>
-      {children}
-    </Component>
   );
 }

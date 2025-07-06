@@ -1,7 +1,5 @@
 # Optimizations to UX
 
-- When users are navigated to the login screen after trying to track a show being unathenticated, on successful login, redirect them back to the show they were trying to track or to the protected route they were trying to access. DONE
-- Optimization todo: If there's an error with the submission of the TrackingInfoForm, TrackingInfoForm
-  should not re-render so the latest information inputted by the user should remain.
 - Need fallbacks for backdrop and poster images in the ShowDetails page.
-- When user switches status to Planning, reset all field Form field values to their default values. Also, display N
+- Change episodes watched field to "current episode" and seasons watched to "current season". Ensure that the user does not put in an episode higher than the total number of episodes for that season. Ensure users don't exceed the number of seasons.
+- Display a progress indicator for the show that indicates how far through the show a user is (current_episode/total episodes in show). If complete, do not display the fields current_episode and current_season.

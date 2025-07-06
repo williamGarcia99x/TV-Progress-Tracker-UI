@@ -132,6 +132,11 @@
     overflow-y: auto;
     /* background-color: var(--color-salty-white); */
   }
+  button {
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }
 
 .app-wrapper {

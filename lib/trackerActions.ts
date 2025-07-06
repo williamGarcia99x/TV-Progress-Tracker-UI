@@ -21,7 +21,7 @@ export interface TrackerActionState {
 export async function createTracker(
   prevState: TrackerActionState,
   formData: FormData
-) {
+): Promise<TrackerActionState> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const userId = cookieStore.get("userId")?.value;
@@ -35,7 +35,11 @@ export async function createTracker(
   const body = {
     userTvTracker: {
       ...Object.fromEntries(
-        formData.entries().filter(([k, v]) => k !== "genreIds" && [k, v])
+        formData
+          .entries()
+          .filter(
+            ([k, v]) => k !== "genreIds" && k !== "originalName" && [k, v]
+          )
       ),
       userId,
     },
@@ -74,35 +78,46 @@ export async function createTracker(
   }
 
   revalidateTag("tracker_data");
-  return { success: "Successfully tracked show ✅" };
+  return { success: "Successfully tracked show 🚀" };
 }
 
 export async function updateTracker(
   prevState: TrackerActionState,
   formData: FormData
-) {
-  console.log(formData);
+): Promise<TrackerActionState> {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const userId = cookieStore.get("userId")?.value;
 
   if (!token) {
-    return { error: "You need to be logged in to update a show." };
+    return { error: "You need to be logged in to track a show." };
   }
 
   if (!userId) return { error: "Missing userId from request" };
 
   const body = {
-    userTvTracker: formData
-      .entries()
-      .reduce(
-        (acc, [key, val]) =>
-          !key.startsWith("$") ? { [key]: val.toString(), ...acc } : acc,
-        { userId: userId }
-      ),
-  };
+    ...Object.fromEntries(
+      formData
+        .entries()
+        .filter(([k, v]) => k !== "genreIds" && k !== "originalName" && [k, v])
+    ),
+    userId,
 
-  const res = await fetch(backendUrl, {
+    //The information below is not needed when updating a tracking
+    // tvShow: {
+    //   showId: formData.get("showId")?.toString(),
+    //   originalName: formData.get("originalName")?.toString(),
+    //   genreIds: formData
+    //     .get("genreIds")
+    //     ?.toString()
+    //     .split(",")
+    //     .map((id) => Number(id)),
+    // },
+  };
+  console.log("IN UPDATE TRACKING");
+  console.log(body);
+
+  const res = await fetch(`${backendUrl}/${body.showId}`, {
     method: "PUT",
     headers: {
       //The authorization header is used to authenticate the request
@@ -126,55 +141,5 @@ export async function updateTracker(
   }
 
   revalidateTag("tracker_data");
-  return { success: "Successfully updated show ✅" };
-}
-
-//TODO REFACTOR DUPLICATE CODE INTO ONE HELPER FUNCTION
-async function trackerRequestPostAndPut(formData: FormData) {
-  console.log(formData);
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-  const userId = cookieStore.get("userId")?.value;
-
-  if (!token) {
-    return { error: "You need to be logged in to update a show." };
-  }
-
-  if (!userId) return { error: "Missing userId from request" };
-
-  const body = {
-    userTvTracker: formData
-      .entries()
-      .reduce(
-        (acc, [key, val]) =>
-          !key.startsWith("$") ? { [key]: val.toString(), ...acc } : acc,
-        { userId: userId }
-      ),
-  };
-
-  const res = await fetch(backendUrl, {
-    method: "PUT",
-    headers: {
-      //The authorization header is used to authenticate the request
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    if (res.status >= 500) {
-      return {
-        error: "An error occurred on our end 😢. Try again later.",
-      };
-    }
-
-    const errorMessage = await res.text();
-    return {
-      error: errorMessage,
-    };
-  }
-
-  revalidateTag("tracker_data");
-  return { success: "Successfully updated show ✅" };
+  return { success: "Successfully updated 🚀" };
 }

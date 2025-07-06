@@ -19,22 +19,7 @@ function ShowDetailsContent({
 }) {
   const [showForm, setShowForm] = useState(() => (trackingInfo ? true : false));
   const router = useRouter();
-  const trackerId = trackingInfo?.trackerId || 0;
-  const tvTrackerInput: UserTvTracker = trackingInfo
-    ? trackingInfo
-    : {
-        trackerId: trackerId,
-        userId: 0,
-        showId: show.id,
-        status: "PLANNING",
-        episodesWatched: null,
-        currentSeason: null,
-        userRating: null,
-        notes: null,
-        dateAdded: "",
-        dateStarted: null,
-        dateCompleted: null,
-      };
+  const trackerId = trackingInfo?.trackerId || Number.MIN_VALUE;
 
   const handleTrackClick = () => {
     if (!isLoggedIn) {
@@ -150,7 +135,7 @@ function ShowDetailsContent({
       {/* Key props forces the component to remount and reread all prop values with fresh data */}
       {showForm && (
         <TrackingInfoForm
-          trackingInfo={tvTrackerInput}
+          trackingInfo={trackingInfo}
           showDetails={show}
           key={trackerId}
         />
