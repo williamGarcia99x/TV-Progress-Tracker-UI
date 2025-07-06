@@ -1,3 +1,5 @@
+import { ShowSummary } from "./tmdb";
+
 const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (!backendUrl) {
@@ -88,4 +90,36 @@ export const getTrackingByUserAndShow = async (
   if (Object.keys(data).length === 0) return null;
 
   return data;
+};
+
+export const getAllUserTrackings = async (
+  token: string,
+  params: Record<string, any> = {}
+): Promise<ShowSummary[]> => {
+  if (!token) {
+    throw new Error("Missing required parameters: token");
+  }
+
+  const url = new URL(`${baseUrl}`);
+
+  Object.entries(params).forEach(([key, val]) =>
+    url.searchParams.set(key, val)
+  );
+
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      //The accept header tells the server what kind of response we expect
+      accept: "application/json",
+      //The authorization header is used to authenticate the request
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || "Failed to fetch tracking data");
+  }
+
+  return await res.json();
 };
