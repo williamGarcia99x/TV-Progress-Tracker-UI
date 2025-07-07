@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -143,4 +144,19 @@ export async function updateTracker(
 
   revalidateTag("tracker_data");
   return { success: "Successfully updated 🚀" };
+}
+
+export async function logoutUser() {
+  const cookieStore = await cookies();
+
+  if (cookieStore.has("token")) {
+    cookieStore.delete("token");
+  }
+  // Remove authentication cookies
+
+  if (cookieStore.has("userId")) {
+    cookieStore.delete("userId");
+  }
+
+  redirect("/");
 }

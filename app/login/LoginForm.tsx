@@ -3,6 +3,7 @@
 import { AuthForm } from "@/components/AuthForm";
 import useAuthMutation, { AuthResponse } from "@/lib/hooks/useAuthMutation";
 import { GalleryVerticalEnd } from "lucide-react";
+import { revalidatePath } from "next/cache";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -50,6 +51,7 @@ function LoginForm() {
       //At this point, the session is an object containing the token and userId.
       await storeSessionAsCookie(session as AuthResponse);
 
+      router.refresh();
       const redirectToUrl = searchParams.get("next");
       if (redirectToUrl) {
         router.replace(redirectToUrl);

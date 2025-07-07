@@ -1,4 +1,5 @@
 import { AuthResponse } from "@/lib/hooks/useAuthMutation";
+import { revalidatePath } from "next/cache";
 // app/api/auth/set-cookie/route.ts
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -34,6 +35,8 @@ export async function POST(req: NextRequest) {
     path: "/",
     expires: new Date(expiresAt), // Set cookie expiration based on expiresAt
   });
+
+  revalidatePath("/", "layout");
 
   return res;
 }

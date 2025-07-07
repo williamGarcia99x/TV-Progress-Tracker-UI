@@ -6,6 +6,7 @@ async function Login() {
   const cookieStore = await cookies(); // Initialize cookies to check if user is logged in
   if (cookieStore.has("token")) {
     //If the user is already logged in, redirect them to the home page.
+
     redirect("/");
     return;
   }

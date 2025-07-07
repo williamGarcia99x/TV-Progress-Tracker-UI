@@ -26,7 +26,7 @@ export default function ShowCarousel({
       <CarouselContent className="px-4 h-[340px]   ">
         {shows.map((show) => (
           <CarouselItem key={show.id} className="basis-auto pl-2 ">
-            <div className="h-full flex   ">
+            <div className=" flex   ">
               <TvShowCard show={show} />
             </div>
           </CarouselItem>
