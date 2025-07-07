@@ -52,7 +52,7 @@ export default async function ShowDetailsPage({
 
   return (
     // Content for page
-    <div className="h-full">
+    <div className="h-full ">
       {/* The flex settings do not apply to the element below because it's absolute */}
       <div className="page-background fixed inset-0 -z-50">
         <Image

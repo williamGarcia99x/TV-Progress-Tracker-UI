@@ -33,13 +33,13 @@ function ShowDetailsContent({
   };
 
   return (
-    <>
-      <main className="information-card relative h-full w-full flex justify-center items-center ">
+    <div className=" min-h-full py-20 space-y-10">
+      <main className="information-card relative w-full flex justify-center items-center  ">
         {/* Show information Card. Centered on page */}
         {/* backdrop image in card */}
         {/* This is centered on page thanks to the div.information-card  */}
 
-        <div className="relative flex justify-between   h-3/4 w-11/12">
+        <div className="relative flex justify-between w-auto h-[700px]">
           {/* Poster */}
           {/* adding w-full forces the div to take up the full width alloted to it from its flex parent */}
           <div className="relative basis-[40%] shrink-0">
@@ -132,15 +132,17 @@ function ShowDetailsContent({
           </div>
         </div>
       </main>
-      {/* Key props forces the component to remount and reread all prop values with fresh data */}
       {showForm && (
-        <TrackingInfoForm
-          trackingInfo={trackingInfo}
-          showDetails={show}
-          key={trackerId}
-        />
+        <div className="w-full flex justify-center ">
+          <TrackingInfoForm
+            trackingInfo={trackingInfo}
+            showDetails={show}
+            key={trackerId}
+          />
+        </div>
       )}
-    </>
+      {/* Key props forces the component to remount and reread all prop values with fresh data */}
+    </div>
   );
 }
 

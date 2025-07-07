@@ -50,36 +50,55 @@ export function AuthForm({
   };
   return (
     <div className={cn("flex flex-col gap-6")}>
-      <Card>
-        <CardHeader className="text-center ">
+      <Card className="bg-cinematic-charcoal">
+        <CardHeader className="text-center text-heading-secondary">
           <CardTitle className="text-xl">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription className="text-gray-300">
+            {description}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="">
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="username">Username</Label>
-                  <Input id="username" name="username" type="text" required />
+                  <Label htmlFor="username" className="text-secondary">
+                    Username
+                  </Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    className="bg-gray-300"
+                  />
                 </div>
                 <div className="grid gap-3">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-secondary">
+                    Password
+                  </Label>
                   <Input
                     id="password"
                     type="password"
                     name="password"
                     required
+                    className="bg-gray-300"
                   />
                 </div>
                 {showConfirmPassword && (
                   <div className="grid gap-3">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label
+                      htmlFor="confirm-password"
+                      className="text-heading-secondary"
+                    >
+                      Confirm Password
+                    </Label>
                     <Input
                       id="confirm-password"
                       type="password"
                       name="confirm-password"
                       required
+                      className="bg-gray-300"
                     />
                   </div>
                 )}
@@ -92,7 +111,11 @@ export function AuthForm({
                   {errorMessage || "placeholder"}
                   {/* Placeholder text is there so that the other elements don't shift */}
                 </p>
-                <Button type="submit" className="w-full" disabled={isPending}>
+                <Button
+                  type="submit"
+                  className="w-full bg-button-gold font-bold text-salty-white text-lg"
+                  disabled={isPending}
+                >
                   {submitLabel}
                 </Button>
               </div>
@@ -102,10 +125,6 @@ export function AuthForm({
           </form>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   );
 }

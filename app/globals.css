@@ -130,6 +130,7 @@
     padding: 0;
     overflow-x: auto;
     overflow-y: auto;
+
     /* background-color: var(--color-salty-white); */
   }
   button {
@@ -140,6 +141,7 @@
 }
 
 .app-wrapper {
+  height: 100%;
   width: 75%;
   max-width: 1600px; /* or 1600px if preferred */
   min-width: 1000px;
@@ -148,13 +150,75 @@
   margin-right: auto;
 }
 
+.background-gradient {
+  background: radial-gradient(
+    ellipse at top,
+    rgba(239, 191, 18, 0.8) 0%,
+    rgba(239, 191, 18, 0.9) 0%,
+    rgba(0, 0, 0, 1) 60%
+  );
+
+  position: absolute;
+  inset: 0;
+  z-index: -999;
+}
+
 @theme {
-  /* walk of fame color */
-  --color-gold-main: #efbf12e3;
-  --color-salty-white: #fff8e7; /*for Background*/
-  --color-cinematic-mocha: #4e342e; /*for Headers*/
-  --color-theater-red: #b71c1c; /*for Buttons or error messages*/
-  --color-navy-blue: #0a0a23; /*for Text and Links*/
+  /* TV Tracker Color Palette */
+
+  /* Main Brand Colors */
+  --color-gold-main: #efbf12;
+  --color-gold-main-alpha: #efbf12e3;
+  --color-salty-white: #fff8e7;
+  --color-cinematic-mocha: #4e342e;
+  --color-theater-red: #b71c1c;
+  --color-navy-blue: #0a0a23;
+  --color-button-gold: #d79e02ab;
+  /* Extended Popcorn-Inspired Palette */
+  --color-buttered-popcorn: #fcd757;
+  --color-golden-kernel: #e5b635;
+  --color-cinematic-charcoal: #1c1c1c;
+  --color-theater-curtain: #b71c1c;
+  --color-silver-screen: #a0a0a0;
+
+  /* Text Colors for TV Content */
+  --color-heading-primary: #ffffff;
+  --color-heading-secondary: #f5f5f5;
+  --color-heading-accent: #efbf12;
+
+  --color-show-title-primary: #ffffff;
+  --color-show-title-hover: #efbf12;
+  --color-show-title-secondary: #e8e8e8;
+
+  --color-description-primary: #cccccc;
+  --color-description-secondary: #b3b3b3;
+  --color-description-muted: #999999;
+
+  /* Accent Colors */
+  --color-accent-warm: #ffd700;
+  --color-accent-cool: #8b8b8b;
+  --color-accent-danger: #ff6b6b;
+  --color-accent-success: #4ecdc4;
+
+  /* Status Colors */
+  --color-status-watching: #4ecdc4;
+  --color-status-completed: #ffd700;
+  --color-status-planning: #8b8b8b;
+  --color-status-dropped: #ff6b6b;
+  --color-status-paused: #ffa500;
+
+  /* Font Family Variables */
+  --font-playfair: var(--font-playfair);
+  --font-inter: var(--font-inter);
+  --font-montserrat: var(--font-montserrat);
+  --font-poppins: var(--font-poppins);
+  --font-roboto-slab: var(--font-roboto-slab);
+
+  /* Font Configurations for different use cases */
+  --font-heading: var(--font-playfair);
+  --font-body: var(--font-inter);
+  --font-accent: var(--font-montserrat);
+  --font-display: var(--font-playfair);
 }
 
 /* Element	Color Name	HEX Code	Description
@@ -164,3 +228,12 @@ White Contrast	Salty White	#FFF8E7	Light creamy white, like popcorn fluff.
 Dark Contrast	Cinematic Charcoal	#1C1C1C	Dark UI base color, gives movie-theater vibes.
 Accent Red	Theater Curtain Red	#B71C1C	Inspired by old-school cinema curtains. Optional accent.
 Neutral Gray	Silver Screen	#A0A0A0	Useful for text and muted UI elements. */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

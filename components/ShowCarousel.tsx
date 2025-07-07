@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import TvShowCard from "@/components/TvShowCard";
 import {
   Carousel,
-  CarouselApi,
   CarouselContent,
   CarouselItem,
   CarouselNext,
@@ -27,11 +26,9 @@ export default function ShowCarousel({
       <CarouselContent className="px-4 h-[340px]   ">
         {shows.map((show) => (
           <CarouselItem key={show.id} className="basis-auto pl-2 ">
-            <Link href={`/shows/${show.id}`}>
-              <div className="h-full flex   ">
-                <TvShowCard show={show} />
-              </div>
-            </Link>
+            <div className="h-full flex   ">
+              <TvShowCard show={show} />
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>

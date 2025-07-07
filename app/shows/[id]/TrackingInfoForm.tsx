@@ -21,6 +21,16 @@ import { UserTvTracker } from "@/lib/trackerService";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SelectGroup } from "@radix-ui/react-select";
 
 type Inputs = {
   status: "PLANNING" | "WATCHING" | "COMPLETED";
@@ -125,20 +135,22 @@ export function TrackingInfoForm({
   return (
     <Form {...form}>
       {/* first arguments passed to handleSubmit is the callback to execute after successful validation */}
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="rounded-xl border  bg-gray-950/50   p-6 text-slate-100 backdrop-blur-md">
-          <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-3/4 rounded-xl border bg-gray-950/60 backdrop-blur-md p-6 text-description-primary"
+      >
+        <h3 className="text-3xl font-bold mb-4">Your Tracking</h3>
+        <div className="flex flex-wrap gap-y-5 items-center mb-4 text-xl ">
           {/* Status */}
           <FormField
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel>Status</FormLabel>
+              <FormItem className="basis-1/3 flex items-center">
+                <FormLabel className="text-xl">Status</FormLabel>
                 <FormControl>
                   <select {...field}>
                     <option value="PLANNING">planning</option>
-
                     <option value="WATCHING">watching</option>
                     <option value="COMPLETED">completed</option>
                   </select>
@@ -153,10 +165,11 @@ export function TrackingInfoForm({
             control={form.control}
             name="episodesWatched"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel>Current Episode</FormLabel>
-                <FormControl>
-                  <input
+              <FormItem className="basis-1/3 flex items-center">
+                <FormLabel className="text-xl">Current Episode</FormLabel>
+                <FormControl className="w-20">
+                  <Input
+                    width={"auto"}
                     type="number"
                     min={0}
                     {...field}
@@ -172,10 +185,10 @@ export function TrackingInfoForm({
             control={form.control}
             name="currentSeason"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel>Current Season</FormLabel>
-                <FormControl>
-                  <input
+              <FormItem className="basis-1/3 flex items-center">
+                <FormLabel className="text-xl">Current Season</FormLabel>
+                <FormControl className="w-20">
+                  <Input
                     type="number"
                     {...field}
                     disabled={status === "PLANNING"}
@@ -185,13 +198,12 @@ export function TrackingInfoForm({
             )}
           />
 
-          {/* Personal Rating */}
           <FormField
             control={form.control}
             name="userRating"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel>Personal Rating</FormLabel>
+              <FormItem className="basis-1/3 flex">
+                <FormLabel className="text-xl">Personal Rating</FormLabel>
                 <FormControl>
                   <select {...field} disabled={status === "PLANNING"}>
                     <option value={""}>N/A</option>
@@ -207,55 +219,55 @@ export function TrackingInfoForm({
           />
 
           {/* Started / Finished */}
-          <div className="flex gap-4">
-            <FormField
-              control={form.control}
-              name="dateStarted"
-              render={({ field }) => (
-                <FormItem className="basis-1/2">
-                  <FormLabel>Started At</FormLabel>
-                  <FormControl>
-                    <input
-                      type="date"
-                      {...field}
-                      disabled={status === "PLANNING"}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dateCompleted"
-              render={({ field }) => (
-                <FormItem className="basis-1/2">
-                  <FormLabel>Finished At</FormLabel>
-                  <FormControl>
-                    <input
-                      type="date"
-                      {...field}
-                      disabled={status === "PLANNING"}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
 
-          {/* Notes */}
           <FormField
             control={form.control}
-            name="notes"
+            name="dateStarted"
             render={({ field }) => (
-              <FormItem className="mb-4">
-                <FormLabel>Notes</FormLabel>
+              <FormItem className="basis-1/3 flex">
+                <FormLabel className="text-xl">Started At</FormLabel>
                 <FormControl>
-                  <textarea {...field} disabled={status === "PLANNING"} />
+                  <input
+                    type="date"
+                    {...field}
+                    disabled={status === "PLANNING"}
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
-          <Button type="submit" className="">
+          <FormField
+            control={form.control}
+            name="dateCompleted"
+            render={({ field }) => (
+              <FormItem className="basis-1/3 flex">
+                <FormLabel className="text-xl">Finished At</FormLabel>
+                <FormControl>
+                  <input
+                    type="date"
+                    {...field}
+                    disabled={status === "PLANNING"}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        {/* Notes */}
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem className="mb-4">
+              <FormLabel className="text-xl">Notes</FormLabel>
+              <FormControl>
+                <Textarea {...field} disabled={status === "PLANNING"} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <div className="w-full flex justify-center">
+          <Button type="submit" className="bg-button-gold ">
             {trackingInfo ? "Edit" : "Track"}
           </Button>
         </div>

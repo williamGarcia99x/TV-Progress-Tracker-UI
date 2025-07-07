@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./Providers";
-import { Search } from "lucide-react";
+
 import SearchMedia from "@/components/ui/SearchMedia";
 import { Toaster } from "react-hot-toast";
 
@@ -18,20 +18,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       <meta name="viewport" content="initial-scale=1, width=device-width" />
-      <body className={` antialiased`}>
+      <body className={` antialiased  `}>
         <Toaster />
         {/* The Providers component wraps the children with the QueryClientProvider */}
         {/* to provide the query client context to the application. */}
         {/* It allows the use of React Query hooks in the children components. */}
         <Providers>
-          <div className="relative min-h-screen grid grid-rows-[auto_1fr] ">
-            {/* Include a header that has the Title of the app and logo. It should not be constrained
+          <div className="relative">
+            <div className="background-gradient "></div>
+            <div className="relative min-h-screen grid grid-rows-[auto_1fr] ">
+              {/* Include a header that has the Title of the app and logo. It should not be constrained
           by the app-wrapper*/}
-            <header className="bg-navy-blue   text-white p-4 flex items-center justify-between ">
-              <h1 className="text-2xl  font-bold">TV Progress Tracker</h1>
-              <SearchMedia />
-            </header>
-            <div className="app-wrapper ">{children}</div>
+              <header className="text-heading-primary bg-cinematic-charcoal border-b-1 border-gray-500 p-2 flex items-center justify-between ">
+                <h1 className="text-2xl  font-bold">Popcorn Watchers 🍿 </h1>
+                <SearchMedia />
+              </header>
+
+              <div className="flex">
+                <div className="relative basis-[100px] shrink-0 bg-cinematic-charcoal">
+                  <aside className="absolute  top-0 bottom-0 left-0  "></aside>
+                </div>
+                <div className="app-wrapper ">{children}</div>
+              </div>
+            </div>
           </div>
         </Providers>
       </body>
